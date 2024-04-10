@@ -1,5 +1,5 @@
 def call (){
     stage ("Terraform apply") {
-        sh "terraform apply tfplan"
+        sh "terraform apply tfPlan"
     }
 }
