@@ -1,10 +1,10 @@
-def call(){
+def call(Map config){
 
     node ("jdk17")
     {
         err =  null
         try {
-            checkoutFromRepo('*/master', 'https://github.com/juanssanchezv/jenkins-test.git')
+            checkoutFromRepo(config.branch, config.repoUrl)
             withCredentials([[
                 $class: 'AmazonWebServicesCredentialsBinding',
                 credentialsId: "AWS-Credentials-Hardcoded",
@@ -12,9 +12,9 @@ def call(){
                 secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
             ]]) {
                 // AWS Code
-                terraformInit('./init-tfvars/dev.tfvars')
+                terraformInit(config)
 
-                terraformPlan('./apply-tfvars/dev.tfvars')
+                terraformPlan(config)
                 
                 terraformApply()
             
@@ -34,47 +34,3 @@ def call(){
     }
 }
 
-def checkout(branch, repoUrl, credentials=""){
-    configs = [
-        url: repoUrl
-    ]
-    if(credentials) {
-        config['credentialsId'] = credentials
-    }
-    stage ("Checkout"){
-        checkout scmGit(branches: [[name: branch]], extensions: [], userRemoteConfigs: [configs])
-    }
-}
-
-def terraformInit (configFilePath="") {
-    stage ("Terraform init") {
-        if (configFilePath){ 
-            sh "terraform init -backend-config=${configFilePath}"
-        }
-        else {
-            sh "terraform init"
-        }
-    }
-}
-
-def terraformPlan (configFilePath="") {
-    stage ("Terraform plan") {
-        if (configFilePath){ 
-            sh "terraform plan -var-file=${configFilePath} -out=tfPlan"
-        }
-        else {
-            sh "terraform plan -out=tfPlan"
-        }
-    }
-}
-
-def terraformApply (configFilePath="") {
-    stage ("Terraform apply") {
-        if (configFilePath){ 
-            sh "terraform apply tfPlan"
-        }
-        else {
-            sh "terraform apply tfPlan"
-        }
-    }
-}

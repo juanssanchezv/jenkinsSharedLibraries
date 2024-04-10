@@ -1,4 +1,4 @@
-def call(branch, repoUrl, credentials=""){
+def call(String branch, String repoUrl, String credentials=""){
     // def checkout(branch, repoUrl, credentials=""){
     configs = [
         url: repoUrl
