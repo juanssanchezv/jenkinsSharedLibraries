@@ -1,10 +1,5 @@
-def call (Map config){
+def call (){
     stage ("Terraform apply") {
-        if (config.filePathApply){ 
-            sh "terraform apply -backend-config=${config.filePathApply}"
-        }
-        else {
-            sh "terraform apply"
-        }
+        sh "terraform apply tfplan"
     }
 }
