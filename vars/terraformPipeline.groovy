@@ -1,4 +1,3 @@
-// Library('cloudcampSharedLibrary') _
 def call(){
 
     node ("jdk17")
