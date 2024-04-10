@@ -1,34 +1,36 @@
 // Library('cloudcampSharedLibrary') _
+def call(){
 
-node ("jdk17")
-{
-    err =  null
-    try {
-        checkoutFromRepo('*/master', 'https://github.com/juanssanchezv/jenkins-test.git')
-        withCredentials([[
-            $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: "AWS-Credentials-Hardcoded",
-            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-        ]]) {
-            // AWS Code
-            terraformInit('./init-tfvars/dev.tfvars')
+    node ("jdk17")
+    {
+        err =  null
+        try {
+            checkoutFromRepo('*/master', 'https://github.com/juanssanchezv/jenkins-test.git')
+            withCredentials([[
+                $class: 'AmazonWebServicesCredentialsBinding',
+                credentialsId: "AWS-Credentials-Hardcoded",
+                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+            ]]) {
+                // AWS Code
+                terraformInit('./init-tfvars/dev.tfvars')
 
-            terraformPlan('./apply-tfvars/dev.tfvars')
+                terraformPlan('./apply-tfvars/dev.tfvars')
+                
+                terraformApply()
             
-            terraformApply()
-         
-        }
+            }
 
-    }
-    catch(exception){
-        err =  exception
-        currentBuild.result = 'FAILURE'
-    }
-    finally{
-        cleanWs()
-        if(err){
-            throw err
+        }
+        catch(exception){
+            err =  exception
+            currentBuild.result = 'FAILURE'
+        }
+        finally{
+            cleanWs()
+            if(err){
+                throw err
+            }
         }
     }
 }
